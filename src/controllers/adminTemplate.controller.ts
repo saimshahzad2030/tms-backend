@@ -69,15 +69,18 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
       .map((step, i) => ({ step, i }))
       .filter(({ step }) => step.trigger === "relation" && step.linkedStep?.index !== undefined);
 await Promise.all(
-      relationSteps.map(({ step, i }) =>
-        prisma.step.update({
-          where: { id: indexToIdMap[i] },
-          data: {
-            linkedStep: {...step.linkedStep,id:indexToIdMap[step.linkedStep.index]}, 
-          },
-        })
-      )
-    );
+  relationSteps.map(({ step, i }) => {
+    if (!step.linkedStep) return;
+
+    // Remove index before updating
+    const { index, ...linkedStepWithoutIndex } = step.linkedStep;
+
+    return prisma.step.update({
+      where: { id: indexToIdMap[i] },
+      data: { linkedStep: { ...linkedStepWithoutIndex, id: indexToIdMap[index] } },
+    });
+  })
+);
 
     const template = await prisma.adminTemplate.findMany({
       where: { id: newTemplate.id },
