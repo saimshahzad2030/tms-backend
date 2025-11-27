@@ -1,0 +1,18 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const user_controller_1 = require("../controllers/user.controller");
+// import { changePasswordOnForget, createUser, sendOtp, getUsers, loginUser, verifyOtp, changePassword, changeInfo, deleteUser } from '../controllers/user.controller';
+const jwt_1 = __importDefault(require("../middleware/jwt"));
+const router = (0, express_1.Router)();
+router.route("/user")
+    .post(user_controller_1.createUser)
+    .get(jwt_1.default.verifyAdmin, user_controller_1.fetchAllUsers);
+router.route("/login")
+    .post(user_controller_1.loginUser)
+    .get(jwt_1.default.autoLogin);
+exports.default = router;
+//# sourceMappingURL=user.routes.js.map
