@@ -1,0 +1,65 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+ provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+ 
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  firstName String?
+  lastName  String?
+  password  String
+  token     String?  @default("")
+  isAdmin   Boolean  @default(false)
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  createdTemplates AdminTemplate[] @relation("CreatedTemplates") // one-to-many
+  enabledTemplates AdminTemplate[] @relation("EnabledUsers")    // many-to-many
+}
+
+ 
+model AdminTemplate {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+
+  // Relations
+  steps        Step[]       @relation("TemplateSteps")
+  enabledUsers User[]       @relation("EnabledUsers") // many-to-many
+  createdBy    User         @relation("CreatedTemplates", fields: [createdById], references: [id])
+  createdById  Int
+  categories   Json[]       // Array of category objects { name: String, color: String }
+}
+ 
+model Step {
+  id                   Int                  @id @default(autoincrement())
+  name                 String
+  columnDetailsChecked Boolean?             @default(false)
+  description          String? 
+  isTimeSensitive      Boolean? 
+  type                 String?              // text | check | date
+  trigger              String               // popup | relation | completed
+  popupDescription     String?
+  completed            Boolean?             @default(false)
+ 
+    unCheckEnabled       Boolean? 
+  templateId           Int
+  template             AdminTemplate        @relation("TemplateSteps", fields: [templateId], references: [id])
+  futureColumnThings   Json[]
+   columnDetails        Json[]
+  unCheckOption        Json?     
+  timeSensitiveColors  Json? 
+  linkedStep        Json?
+} 
