@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,8 +29,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../db/db"));
 const jwtConfig = {
     sign(payload) {
-        console.log(payload);
-        console.log("process.env.JWT_SECRET_KEY ", process.env.JWT_SECRET_KEY);
+        console.log("payload", payload);
         const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET_KEY);
         return token;
     },
@@ -177,19 +187,21 @@ const jwtConfig = {
             if (authHeader) {
                 const [bearer, token] = authHeader.split(" ");
                 jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => __awaiter(this, void 0, void 0, function* () {
+                    console.log(decoded);
                     if (err) {
                         res.status(401).json({ message: "You are not authorized" });
                     }
                     else {
-                        const user = yield db_1.default.user.findFirst({
-                            where: {
-                                token: token
-                            },
-                        });
-                        if (!user) {
-                            return res.status(401).json({ message: "You are not authorized" });
-                        }
-                        return res.status(200).json({ message: "Details Fetched", user });
+                        // const user = await prisma.user.findFirst({
+                        //   where: {
+                        //     token: token
+                        //   },
+                        // })
+                        // if (!user) {
+                        //   return res.status(401).json({ message: "You are not authorized" });
+                        // }
+                        const { id } = decoded, details = __rest(decoded, ["id"]);
+                        return res.status(200).json({ message: "Logged in Succesfully", user: details });
                     }
                 }));
             }

@@ -71,6 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
       id: userExist.id,
       email: userExist.email,
       username: userExist.username,
+      role: userExist.isAdmin ? "admin" : "user",
     })
     
     const updatedUser = await prisma.user.update({

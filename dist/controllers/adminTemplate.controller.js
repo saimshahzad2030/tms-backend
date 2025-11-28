@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.denyTemplateAccessToUser = exports.allowTemplateAccessToUser = exports.deleteTemplate = exports.fetchAllTemplates = exports.fetchAdminTemplates = exports.updateAdminTemplate = exports.createAdminTemplate = void 0;
+exports.denyTemplateAccessToUser = exports.allowTemplateAccessToUser = exports.deleteTemplate = exports.fetchAllTemplates = exports.fetchUserAllowedSingleTemplate = exports.fetchUserAllowedTemplates = exports.fetchAdminTemplates = exports.updateAdminTemplate = exports.createAdminTemplate = void 0;
 const db_1 = __importDefault(require("../db/db"));
 const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -97,7 +97,7 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
         }));
         const template = yield db_1.default.adminTemplate.findMany({
             where: { id: newTemplate.id },
-            include: { steps: true },
+            include: { steps: true, enabledUsers: true },
         });
         res.status(201).json({ message: "AdminTemplate created successfully", template });
     }
@@ -188,7 +188,7 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
         }));
         const template = yield db_1.default.adminTemplate.findUnique({
             where: { id },
-            include: { steps: true },
+            include: { steps: true, enabledUsers: true },
         });
         res.status(200).json({ message: "AdminTemplate updated successfully", template });
     }
@@ -214,6 +214,48 @@ const fetchAdminTemplates = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.fetchAdminTemplates = fetchAdminTemplates;
+const fetchUserAllowedTemplates = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        const templates = yield db_1.default.adminTemplate.findMany({
+            where: { enabledUsers: { some: { id: userId } } },
+            include: { steps: true, enabledUsers: true }
+        });
+        res.status(201).json({ message: "Fetched User Allowed Templates", templates });
+    }
+    catch (error) {
+        console.error("Error creating AdminTemplate:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+exports.fetchUserAllowedTemplates = fetchUserAllowedTemplates;
+const fetchUserAllowedSingleTemplate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
+        const templateId = Number(req.query.templateId);
+        if (!templateId) {
+            return res.status(400).json({ message: "templateId is required." });
+        }
+        const template = yield db_1.default.adminTemplate.findUnique({
+            where: {
+                id: templateId,
+                enabledUsers: { some: { id: userId } }
+            },
+            include: {
+                steps: true,
+                enabledUsers: true
+            }
+        });
+        res.status(201).json({ message: "Fetched your single template", template });
+    }
+    catch (error) {
+        console.error("Error creating AdminTemplate:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+exports.fetchUserAllowedSingleTemplate = fetchUserAllowedSingleTemplate;
 const fetchAllTemplates = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const templates = yield db_1.default.adminTemplate.findMany({ include: { steps: true, enabledUsers: true } });
@@ -254,6 +296,9 @@ exports.deleteTemplate = deleteTemplate;
 const allowTemplateAccessToUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { templateId, userId } = req.body;
+        if (!templateId || !userId) {
+            return res.status(400).json({ message: "templateId and userId are required." });
+        }
         const templates = yield db_1.default.adminTemplate.update({
             where: { id: templateId },
             data: {
@@ -274,6 +319,9 @@ exports.allowTemplateAccessToUser = allowTemplateAccessToUser;
 const denyTemplateAccessToUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { templateId, userId } = req.body;
+        if (!templateId || !userId) {
+            return res.status(400).json({ message: "templateId and userId are required." });
+        }
         const templates = yield db_1.default.adminTemplate.update({
             where: { id: templateId },
             data: {

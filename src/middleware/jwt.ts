@@ -3,10 +3,10 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 // import config from "../config";
 import prisma from "../db/db"; 
+import { decode } from "punycode";
 const jwtConfig = {
   sign(payload: object): string {
-    console.log(payload)
-    console.log("process.env.JWT_SECRET_KEY ",process.env.JWT_SECRET_KEY )
+    console.log("payload",payload) 
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string);
     
     return token;
@@ -164,26 +164,27 @@ const jwtConfig = {
 
 
         jwt.verify(token, process.env.JWT_SECRET_KEY as string, async (err: any, decoded: any) => {
+          console.log(decoded)
           if (err) {
             res.status(401).json({ message: "You are not authorized" });
-          } else {
-
-            const user = await prisma.user.findFirst({
-              where: {
-                token: token
-              },
+          } else {  
+ 
+            // const user = await prisma.user.findFirst({
+            //   where: {
+            //     token: token
+            //   },
             
 
-            })
+            // })
 
 
 
-            if (!user) {
-              return res.status(401).json({ message: "You are not authorized" });
+            // if (!user) {
+            //   return res.status(401).json({ message: "You are not authorized" });
 
-            }
-
-            return res.status(200).json({ message: "Details Fetched", user })
+            // }
+            const {id,...details} = decoded  
+            return res.status(200).json({ message: "Logged in Succesfully",user: details })
           }
         })
 

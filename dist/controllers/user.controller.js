@@ -83,6 +83,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             id: userExist.id,
             email: userExist.email,
             username: userExist.username,
+            role: userExist.isAdmin ? "admin" : "user",
         });
         const updatedUser = yield db_1.default.user.update({
             where: {

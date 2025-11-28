@@ -16,5 +16,9 @@ router.route("/admin-templates")
     .get(jwt_1.default.verifyAdmin, adminTemplate_controller_1.fetchAllTemplates)
     .patch(jwt_1.default.verifyAdmin, adminTemplate_controller_1.allowTemplateAccessToUser)
     .delete(jwt_1.default.verifyAdmin, adminTemplate_controller_1.denyTemplateAccessToUser);
+router.route("/user-allowed-templates")
+    .get(jwt_1.default.verifyUser, adminTemplate_controller_1.fetchUserAllowedTemplates);
+router.route("/user-allowed-template")
+    .get(jwt_1.default.verifyUser, adminTemplate_controller_1.fetchUserAllowedSingleTemplate);
 exports.default = router;
 //# sourceMappingURL=adminTemplate.routes.js.map

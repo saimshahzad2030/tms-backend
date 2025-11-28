@@ -84,7 +84,7 @@ await Promise.all(
 
     const template = await prisma.adminTemplate.findMany({
       where: { id: newTemplate.id },
-      include: { steps: true },
+      include: { steps: true,enabledUsers:true  },
     });
     res.status(201).json({ message: "AdminTemplate created successfully",template });
 
@@ -187,7 +187,8 @@ await Promise.all(
 
 const template = await prisma.adminTemplate.findUnique({
   where: { id },
-  include: { steps: true },
+        include: { steps: true,enabledUsers:true  },
+
 });
 
 res.status(200).json({ message: "AdminTemplate updated successfully", template });
@@ -214,7 +215,46 @@ export const fetchAdminTemplates = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
+export const fetchUserAllowedTemplates = async (req: Request, res: Response) => {
+  try { 
+    const userId: number = res.locals.user?.id;
+ 
+    const templates = await prisma.adminTemplate.findMany({
+      where: { enabledUsers: { some: { id: userId } } },
+       include:{steps:true ,enabledUsers:true  } 
+    });
+    res.status(201).json({ message: "Fetched User Allowed Templates",templates });
 
+  } catch (error) {
+    console.error("Error creating AdminTemplate:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+export const fetchUserAllowedSingleTemplate = async (req: Request, res: Response) => {
+  try { 
+    const userId: number = res.locals.user?.id;
+    const templateId = Number(req.query.templateId);
+      if (!templateId  ) {
+      return res.status(400).json({ message: "templateId is required." });
+    }
+     const template = await prisma.adminTemplate.findUnique({
+      where: { 
+        id: templateId,
+        enabledUsers: { some: { id: userId } }
+      },
+      include: {
+        steps: true,
+        enabledUsers: true
+      }
+    });
+     
+    res.status(201).json({ message: "Fetched your single template",template });
+
+  } catch (error) {
+    console.error("Error creating AdminTemplate:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
 export const fetchAllTemplates = async (req: Request, res: Response) => {
   try {  
     const templates = await prisma.adminTemplate.findMany({include:{steps:true ,enabledUsers:true }});
@@ -253,6 +293,9 @@ export const deleteTemplate = async (req: Request, res: Response) => {
 export const allowTemplateAccessToUser = async (req: Request, res: Response) => {
   try {  
     const {templateId,userId} = req.body;
+    if (!templateId || !userId) {
+      return res.status(400).json({ message: "templateId and userId are required." });
+    }
     const templates = await prisma.adminTemplate.update({
       where:{id:templateId},
        data:{
@@ -272,6 +315,10 @@ export const allowTemplateAccessToUser = async (req: Request, res: Response) => 
 export const denyTemplateAccessToUser = async (req: Request, res: Response) => {
   try {  
     const {templateId,userId} = req.body;
+    if (!templateId || !userId) {
+      return res.status(400).json({ message: "templateId and userId are required." });
+    }
+     
     const templates = await prisma.adminTemplate.update({
       where:{id:templateId},
        data:{
