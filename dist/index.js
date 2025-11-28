@@ -31,7 +31,7 @@ const port = process.env.PORT || 3000;
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const courses = yield db_1.default.user.findMany({ take: 10 });
-        res.status(200).json({ message: 'Users fetched', courses });
+        res.status(200).json({ message: 'Your Backend Works Fine :)' });
     }
     catch (error) {
         res.status(500).json({ error: error });
