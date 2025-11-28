@@ -19,7 +19,7 @@ const jwt_1 = __importDefault(require("../middleware/jwt"));
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName, email, username, password } = req.body;
-        if (!firstName || !lastName || !email || !username || !password) {
+        if (!email || !username || !password) {
             return res.status(400).json({
                 message: 'All fields are required.',
             });
@@ -44,8 +44,8 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         // Create the user
         const newUser = yield db_1.default.user.create({
             data: {
-                firstName,
-                lastName,
+                firstName: firstName || "firstName",
+                lastName: lastName || "lastName",
                 email,
                 token: "",
                 username,

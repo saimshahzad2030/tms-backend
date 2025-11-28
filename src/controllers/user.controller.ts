@@ -5,7 +5,7 @@ import jwtConfig from "../middleware/jwt";
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
-    if (!firstName || !lastName || !email || !username || !password) {
+    if (    !email || !username || !password) {
       return res.status(400).json({
         message: 'All fields are required.',
       });
@@ -30,8 +30,8 @@ export const createUser = async (req: Request, res: Response) => {
     // Create the user
     const newUser = await prisma.user.create({
       data: {
-        firstName,
-        lastName,
+        firstName: firstName || "firstName",
+        lastName: lastName || "lastName",
         email, 
         token:"",
         username, 
