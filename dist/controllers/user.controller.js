@@ -18,6 +18,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jwt_1 = __importDefault(require("../middleware/jwt"));
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(req.body);
         const { firstName, lastName, email, username, password } = req.body;
         if (!email || !username || !password) {
             return res.status(400).json({
@@ -63,6 +64,7 @@ exports.createUser = createUser;
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
+        console.log(req.body);
         if (!email || !password) {
             return res.status(404).json({ message: "All fields requried" });
         }
@@ -102,8 +104,8 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.loginUser = loginUser;
 const fetchAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const Users = yield db_1.default.user.findMany({ where: { isAdmin: false } });
-        res.status(201).json({ message: "All Users are fetched succesfully", Users });
+        const users = yield db_1.default.user.findMany({ where: { isAdmin: false } });
+        res.status(201).json({ message: "All Users are fetched succesfully", users });
     }
     catch (error) {
         console.error("Error fetching Users", error);

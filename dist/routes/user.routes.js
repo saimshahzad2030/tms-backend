@@ -7,12 +7,14 @@ const express_1 = require("express");
 const user_controller_1 = require("../controllers/user.controller");
 // import { changePasswordOnForget, createUser, sendOtp, getUsers, loginUser, verifyOtp, changePassword, changeInfo, deleteUser } from '../controllers/user.controller';
 const jwt_1 = __importDefault(require("../middleware/jwt"));
+const multer_1 = __importDefault(require("multer"));
+const upload = (0, multer_1.default)(); // memory storage
 const router = (0, express_1.Router)();
 router.route("/user")
-    .post(user_controller_1.createUser)
-    .get(jwt_1.default.verifyAdmin, user_controller_1.fetchAllUsers);
+    .post(upload.none(), user_controller_1.createUser)
+    .get(jwt_1.default.verifyAdmin, upload.none(), user_controller_1.fetchAllUsers);
 router.route("/login")
-    .post(user_controller_1.loginUser)
+    .post(upload.none(), user_controller_1.loginUser)
     .get(jwt_1.default.autoLogin);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

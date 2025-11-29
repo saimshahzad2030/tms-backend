@@ -56,12 +56,12 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                             linkedStepId: step.linkedStepId,
                             trigger: step.trigger,
                             popupDescription: (_a = step === null || step === void 0 ? void 0 : step.popup) === null || _a === void 0 ? void 0 : _a.description,
-                            completed: step.completed,
-                            unCheckEnabled: step.unCheckEnabled,
-                            columnDetailsChecked: step.columnDetailsChecked,
+                            completed: step.completed === "true" || step.completed === true, // <- force boolean
+                            unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
+                            columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
                             unCheckOption: step.unCheckOption,
                             timeSensitiveColors: step.timeSensitiveColors,
-                            isTimeSensitive: step.isTimeSensitive,
+                            isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
                             futureColumnThings: step.futureColumnThings,
                             columnDetails: step.columnDetails,
                             linkedStep: step.linkedStep
@@ -152,12 +152,12 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                             linkedStepId: step.linkedStepId,
                             trigger: step.trigger,
                             popupDescription: (_a = step === null || step === void 0 ? void 0 : step.popup) === null || _a === void 0 ? void 0 : _a.description,
-                            completed: step.completed,
-                            unCheckEnabled: step.unCheckEnabled,
-                            columnDetailsChecked: step.columnDetailsChecked,
+                            completed: step.completed === "true" || step.completed === true, // <- force boolean
+                            unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
+                            columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
                             unCheckOption: step.unCheckOption,
                             timeSensitiveColors: step.timeSensitiveColors,
-                            isTimeSensitive: step.isTimeSensitive,
+                            isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
                             futureColumnThings: step.futureColumnThings,
                             columnDetails: step.columnDetails,
                             linkedStep: linkedStepWithoutIndex,
@@ -270,7 +270,8 @@ exports.fetchAllTemplates = fetchAllTemplates;
 const deleteTemplate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const { templateId } = req.body;
+        const templateId = Number(req.query.id);
+        ;
         const adminId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
         const templateToDelete = yield db_1.default.adminTemplate.findUnique({
             where: { id: templateId, createdById: adminId, },
@@ -295,20 +296,22 @@ const deleteTemplate = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.deleteTemplate = deleteTemplate;
 const allowTemplateAccessToUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { templateId, userId } = req.body;
+        const templateId = Number(req.query.id);
+        ;
+        const { userId } = req.body;
         if (!templateId || !userId) {
             return res.status(400).json({ message: "templateId and userId are required." });
         }
-        const templates = yield db_1.default.adminTemplate.update({
+        const template = yield db_1.default.adminTemplate.update({
             where: { id: templateId },
             data: {
                 enabledUsers: {
-                    connect: { id: userId }
+                    connect: { id: Number(userId) }
                 }
             },
             include: { steps: true, enabledUsers: true }
         });
-        res.status(201).json({ message: "This user allowed access to the template", templates });
+        res.status(201).json({ message: "This user allowed access to the template", template });
     }
     catch (error) {
         console.error("Error creating AdminTemplate:", error);

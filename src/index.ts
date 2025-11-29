@@ -6,13 +6,15 @@ import cors from 'cors'
 import bodyParser from 'body-parser';
 const app = express();
 app.use(cors())
-app.use(
-  bodyParser.json({
-    verify: (req: Request, res: Response, buf) => {
-      req.body = buf;
-    },
-  })
-);
+// app.use(
+//   bodyParser.json({
+//     verify: (req: Request, res: Response, buf) => {
+//       req.body = buf;
+//     },
+//   })
+// );
+app.use(express.json());
+
 app.use("/api", userRoutes); 
 app.use("/api", adminTemplateRoutes); 
 const port = process.env.PORT || 3000;

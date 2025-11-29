@@ -36,13 +36,12 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
             linkedStepId: step.linkedStepId,
             trigger: step.trigger,
             popupDescription: step?.popup?.description,
-            completed: step.completed,
-
-            unCheckEnabled: step.unCheckEnabled,
-            columnDetailsChecked: step.columnDetailsChecked,
-            unCheckOption: step.unCheckOption,
-            timeSensitiveColors: step.timeSensitiveColors,
-            isTimeSensitive: step.isTimeSensitive, 
+           completed: step.completed === "true" || step.completed === true, // <- force boolean
+        unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
+        columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
+        unCheckOption: step.unCheckOption,
+        timeSensitiveColors: step.timeSensitiveColors,
+        isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
             futureColumnThings  : step.futureColumnThings,
             columnDetails: step.columnDetails,
             linkedStep: step.linkedStep  
@@ -143,12 +142,12 @@ const updatedTemplate = await prisma.adminTemplate.update({
       linkedStepId: step.linkedStepId,
       trigger: step.trigger,
       popupDescription: step?.popup?.description,
-      completed: step.completed,
-      unCheckEnabled: step.unCheckEnabled,
-      columnDetailsChecked: step.columnDetailsChecked,
-      unCheckOption: step.unCheckOption,
-      timeSensitiveColors: step.timeSensitiveColors,
-      isTimeSensitive: step.isTimeSensitive,
+        completed: step.completed === "true" || step.completed === true, // <- force boolean
+        unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
+        columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
+        unCheckOption: step.unCheckOption,
+        timeSensitiveColors: step.timeSensitiveColors,
+        isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
       futureColumnThings: step.futureColumnThings,
       columnDetails: step.columnDetails,
       linkedStep: linkedStepWithoutIndex,
@@ -267,7 +266,7 @@ export const fetchAllTemplates = async (req: Request, res: Response) => {
 };
 export const deleteTemplate = async (req: Request, res: Response) => {
   try {  
-    const {templateId} = req.body;
+    const templateId   = Number(req.query.id);;
     const adminId: number = res.locals.user?.id;
     const templateToDelete = await prisma.adminTemplate.findUnique({
       where:{id:templateId,createdById: adminId,},
@@ -292,20 +291,22 @@ export const deleteTemplate = async (req: Request, res: Response) => {
 };
 export const allowTemplateAccessToUser = async (req: Request, res: Response) => {
   try {  
-    const {templateId,userId} = req.body;
+    const templateId   = Number(req.query.id);;
+
+    const {userId} = req.body;
     if (!templateId || !userId) {
       return res.status(400).json({ message: "templateId and userId are required." });
     }
-    const templates = await prisma.adminTemplate.update({
+    const template = await prisma.adminTemplate.update({
       where:{id:templateId},
        data:{
         enabledUsers:{
-          connect:{id:userId}
+          connect:{id:Number(userId)}
         } 
        },
        include:{steps:true ,enabledUsers:true } 
     });
-    res.status(201).json({ message: "This user allowed access to the template",templates });
+    res.status(201).json({ message: "This user allowed access to the template",template });
 
   } catch (error) {
     console.error("Error creating AdminTemplate:", error);

@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwtConfig from "../middleware/jwt"; 
 export const createUser = async (req: Request, res: Response) => {
   try {
+    console.log(req.body)
     const { firstName, lastName, email, username, password } = req.body;
     if (    !email || !username || !password) {
       return res.status(400).json({
@@ -48,7 +49,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    
+    console.log(req.body)
     if (!email || !password) {
       return res.status(404).json({ message: "All fields requried" });
     }
@@ -92,8 +93,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const fetchAllUsers = async (req: Request, res: Response) => {
   try {  
-    const Users = await prisma.user.findMany({where:{isAdmin:false}});
-    res.status(201).json({ message: "All Users are fetched succesfully",Users });
+    const users = await prisma.user.findMany({where:{isAdmin:false}});
+    res.status(201).json({ message: "All Users are fetched succesfully",users });
 
   } catch (error) {
     console.error("Error fetching Users", error);

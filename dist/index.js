@@ -17,14 +17,16 @@ const db_1 = __importDefault(require("./db/db"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const adminTemplate_routes_1 = __importDefault(require("./routes/adminTemplate.routes"));
 const cors_1 = __importDefault(require("cors"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
-app.use(body_parser_1.default.json({
-    verify: (req, res, buf) => {
-        req.body = buf;
-    },
-}));
+// app.use(
+//   bodyParser.json({
+//     verify: (req: Request, res: Response, buf) => {
+//       req.body = buf;
+//     },
+//   })
+// );
+app.use(express_1.default.json());
 app.use("/api", user_routes_1.default);
 app.use("/api", adminTemplate_routes_1.default);
 const port = process.env.PORT || 3000;

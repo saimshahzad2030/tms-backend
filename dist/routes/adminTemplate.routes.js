@@ -7,14 +7,16 @@ const express_1 = require("express");
 const adminTemplate_controller_1 = require("../controllers/adminTemplate.controller");
 const jwt_1 = __importDefault(require("../middleware/jwt"));
 const router = (0, express_1.Router)();
+const multer_1 = __importDefault(require("multer"));
+const upload = (0, multer_1.default)(); // memory storage
 router.route("/admin-template")
-    .post(jwt_1.default.verifyAdmin, adminTemplate_controller_1.createAdminTemplate)
+    .post(jwt_1.default.verifyAdmin, upload.none(), adminTemplate_controller_1.createAdminTemplate)
     .get(jwt_1.default.verifyAdmin, adminTemplate_controller_1.fetchAdminTemplates)
-    .patch(jwt_1.default.verifyAdmin, adminTemplate_controller_1.updateAdminTemplate)
+    .patch(jwt_1.default.verifyAdmin, upload.none(), adminTemplate_controller_1.updateAdminTemplate)
     .delete(jwt_1.default.verifyAdmin, adminTemplate_controller_1.deleteTemplate);
 router.route("/admin-templates")
     .get(jwt_1.default.verifyAdmin, adminTemplate_controller_1.fetchAllTemplates)
-    .patch(jwt_1.default.verifyAdmin, adminTemplate_controller_1.allowTemplateAccessToUser)
+    .patch(jwt_1.default.verifyAdmin, upload.none(), adminTemplate_controller_1.allowTemplateAccessToUser)
     .delete(jwt_1.default.verifyAdmin, adminTemplate_controller_1.denyTemplateAccessToUser);
 router.route("/user-allowed-templates")
     .get(jwt_1.default.verifyUser, adminTemplate_controller_1.fetchUserAllowedTemplates);

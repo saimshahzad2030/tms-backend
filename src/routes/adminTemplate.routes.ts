@@ -4,16 +4,18 @@ import { allowTemplateAccessToUser, createAdminTemplate, deleteTemplate, denyTem
 import jwtConfig from "../middleware/jwt";
  
 const router = Router()
+  import multer from "multer";
+ const upload = multer(); // memory storage
  
 router.route("/admin-template")
-    .post(jwtConfig.verifyAdmin,createAdminTemplate)  
+    .post(jwtConfig.verifyAdmin,upload.none(),createAdminTemplate)  
     .get(jwtConfig.verifyAdmin,fetchAdminTemplates)
-    .patch(jwtConfig.verifyAdmin,updateAdminTemplate)  
+    .patch(jwtConfig.verifyAdmin,upload.none(),updateAdminTemplate)  
     .delete(jwtConfig.verifyAdmin,deleteTemplate)
    
 router.route("/admin-templates")  
     .get(jwtConfig.verifyAdmin,fetchAllTemplates)   
-    .patch(jwtConfig.verifyAdmin,allowTemplateAccessToUser)
+    .patch(jwtConfig.verifyAdmin,upload.none(),allowTemplateAccessToUser)
     .delete(jwtConfig.verifyAdmin,denyTemplateAccessToUser)
     
 router.route("/user-allowed-templates")  
