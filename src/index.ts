@@ -3,7 +3,18 @@ import prisma from './db/db'
 import userRoutes from './routes/user.routes'; 
 import adminTemplateRoutes from './routes/adminTemplate.routes'; 
 import cors from 'cors'
-import bodyParser from 'body-parser';
+import bodyParser from 'body-parser'; 
+
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
 const app = express();
 app.use(cors())
 // app.use(

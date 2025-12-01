@@ -21,6 +21,6 @@ router.route("/admin-templates")
 router.route("/user-allowed-templates")
     .get(jwt_1.default.verifyUser, adminTemplate_controller_1.fetchUserAllowedTemplates);
 router.route("/user-allowed-template")
-    .get(jwt_1.default.verifyUser, adminTemplate_controller_1.fetchUserAllowedSingleTemplate);
+    .get(jwt_1.default.verifyUser, upload.none(), adminTemplate_controller_1.fetchUserAllowedSingleTemplate);
 exports.default = router;
 //# sourceMappingURL=adminTemplate.routes.js.map

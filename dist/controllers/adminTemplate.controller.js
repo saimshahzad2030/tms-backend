@@ -51,6 +51,7 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                         var _a;
                         return ({
                             name: step.name,
+                            columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
                             description: step.description,
                             type: step.type,
                             linkedStepId: step.linkedStepId,
@@ -149,6 +150,7 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                             name: step.name,
                             description: step.description,
                             type: step.type,
+                            columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
                             linkedStepId: step.linkedStepId,
                             trigger: step.trigger,
                             popupDescription: (_a = step === null || step === void 0 ? void 0 : step.popup) === null || _a === void 0 ? void 0 : _a.description,
@@ -238,20 +240,26 @@ const fetchUserAllowedSingleTemplate = (req, res) => __awaiter(void 0, void 0, v
         if (!templateId) {
             return res.status(400).json({ message: "templateId is required." });
         }
-        const template = yield db_1.default.adminTemplate.findUnique({
+        const template = yield db_1.default.adminTemplate.findFirst({
             where: {
                 id: templateId,
-                enabledUsers: { some: { id: userId } }
+                OR: [
+                    { createdById: userId }, // if the user is the creator
+                    { enabledUsers: { some: { id: userId } } } // or user is enabled
+                ]
             },
             include: {
                 steps: true,
                 enabledUsers: true
             }
         });
-        res.status(201).json({ message: "Fetched your single template", template });
+        if (!template) {
+            return res.status(404).json({ message: "Template not found or access denied." });
+        }
+        res.status(200).json({ message: "Fetched your single template", template });
     }
     catch (error) {
-        console.error("Error creating AdminTemplate:", error);
+        console.error("Error fetching single template:", error);
         res.status(500).json({ message: "Internal server error", error });
     }
 });

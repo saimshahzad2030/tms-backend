@@ -21,5 +21,5 @@ router.route("/admin-templates")
 router.route("/user-allowed-templates")  
     .get(jwtConfig.verifyUser,fetchUserAllowedTemplates)   
     router.route("/user-allowed-template")  
-    .get(jwtConfig.verifyUser,fetchUserAllowedSingleTemplate)   
+    .get(jwtConfig.verifyUser,upload.none(),fetchUserAllowedSingleTemplate)   
 export default router;

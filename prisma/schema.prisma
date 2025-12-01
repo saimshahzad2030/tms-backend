@@ -54,12 +54,13 @@ model Step {
   trigger              String               // popup | relation | completed
   popupDescription     String?
   completed            Boolean?             @default(false)
+  columnByCategoriesEnabled Boolean?      @default(false)
  
     unCheckEnabled       Boolean? 
   templateId           Int
   template             AdminTemplate        @relation("TemplateSteps", fields: [templateId], references: [id])
   futureColumnThings   Json[]
-   columnDetails        Json[]
+   columnDetails        Json?
   unCheckOption        Json?     
   timeSensitiveColors  Json? 
   linkedStep        Json?

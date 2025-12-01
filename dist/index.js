@@ -17,6 +17,14 @@ const db_1 = __importDefault(require("./db/db"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const adminTemplate_routes_1 = __importDefault(require("./routes/adminTemplate.routes"));
 const cors_1 = __importDefault(require("cors"));
+process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
+    yield db_1.default.$disconnect();
+    process.exit(0);
+}));
+process.on("SIGTERM", () => __awaiter(void 0, void 0, void 0, function* () {
+    yield db_1.default.$disconnect();
+    process.exit(0);
+}));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 // app.use(

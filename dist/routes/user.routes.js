@@ -16,5 +16,7 @@ router.route("/user")
 router.route("/login")
     .post(upload.none(), user_controller_1.loginUser)
     .get(jwt_1.default.autoLogin);
+router.route("/user-auth-check")
+    .get(upload.none(), jwt_1.default.authGuard);
 exports.default = router;
 //# sourceMappingURL=user.routes.js.map

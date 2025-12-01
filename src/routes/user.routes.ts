@@ -14,4 +14,6 @@ router.route("/user")
   router.route("/login")
     .post(upload.none(), loginUser)  
     .get(jwtConfig.autoLogin)  
+    router.route("/user-auth-check")
+    .get(upload.none(),jwtConfig.authGuard)
 export default router;

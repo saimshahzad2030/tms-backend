@@ -32,20 +32,18 @@ CREATE TABLE "Step" (
     "name" TEXT NOT NULL,
     "columnDetailsChecked" BOOLEAN DEFAULT false,
     "description" TEXT,
-    "unCheckOptionId" INTEGER,
     "isTimeSensitive" BOOLEAN,
-    "timeSensitiveColorsId" INTEGER,
     "type" TEXT,
     "trigger" TEXT NOT NULL,
     "popupDescription" TEXT,
     "completed" BOOLEAN DEFAULT false,
-    "linkedStepId" INTEGER,
     "unCheckEnabled" BOOLEAN,
     "templateId" INTEGER NOT NULL,
     "futureColumnThings" JSONB[],
-    "columnDetails" JSONB[],
+    "columnDetails" JSONB,
     "unCheckOption" JSONB,
     "timeSensitiveColors" JSONB,
+    "linkedStep" JSONB,
 
     CONSTRAINT "Step_pkey" PRIMARY KEY ("id")
 );

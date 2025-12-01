@@ -34,8 +34,9 @@ const jwtConfig = {
         return token;
     },
     verifyUser(req, res, next) {
-        var _a;
+        var _a, _b;
         const authHeader = (_a = req === null || req === void 0 ? void 0 : req.headers) === null || _a === void 0 ? void 0 : _a.authorization;
+        console.log('authHeader', (_b = req === null || req === void 0 ? void 0 : req.headers) === null || _b === void 0 ? void 0 : _b.authorization);
         try {
             if (authHeader) {
                 const [bearer, token] = authHeader.split(" ");
@@ -44,9 +45,9 @@ const jwtConfig = {
                         res.status(401).json({ message: "You need to login first" });
                     }
                     else {
-                        const user = yield db_1.default.user.findFirst({
+                        const user = yield db_1.default.user.findUnique({
                             where: {
-                                token
+                                id: decoded.id
                             }
                         });
                         if (user) {
@@ -150,6 +151,9 @@ const jwtConfig = {
     authGuard(req, res) {
         var _a;
         const authHeader = (_a = req === null || req === void 0 ? void 0 : req.headers) === null || _a === void 0 ? void 0 : _a.authorization;
+        console.log("req?.headers");
+        console.log(req === null || req === void 0 ? void 0 : req.headers);
+        console.log("req?.headers");
         try {
             if (authHeader) {
                 console.log(res.locals.user);
@@ -165,7 +169,7 @@ const jwtConfig = {
                             }
                         });
                         if (user) {
-                            return res.status(200).json({ message: "User Authorized" });
+                            return res.status(200).json({ message: "User Authorized", isAdmin: user.isAdmin });
                         }
                         return res.status(200).json({ message: "You are not authorized" });
                     }

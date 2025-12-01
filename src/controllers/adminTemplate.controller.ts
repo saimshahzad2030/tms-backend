@@ -31,6 +31,7 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
         steps: {
           create: steps.map((step, index) => ({
             name: step.name,
+            columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
             description: step.description,
             type: step.type,
             linkedStepId: step.linkedStepId,
@@ -139,6 +140,8 @@ const updatedTemplate = await prisma.adminTemplate.update({
       name: step.name,
       description: step.description,
       type: step.type,
+            columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
+      
       linkedStepId: step.linkedStepId,
       trigger: step.trigger,
       popupDescription: step?.popup?.description,
@@ -230,30 +233,41 @@ export const fetchUserAllowedTemplates = async (req: Request, res: Response) => 
   }
 };
 export const fetchUserAllowedSingleTemplate = async (req: Request, res: Response) => {
-  try { 
-    const userId: number = res.locals.user?.id;
-    const templateId = Number(req.query.templateId);
-      if (!templateId  ) {
-      return res.status(400).json({ message: "templateId is required." });
-    }
-     const template = await prisma.adminTemplate.findUnique({
-      where: { 
-        id: templateId,
-        enabledUsers: { some: { id: userId } }
-      },
-      include: {
-        steps: true,
-        enabledUsers: true
-      }
-    });
-     
-    res.status(201).json({ message: "Fetched your single template",template });
+try {
+const userId = res.locals.user?.id;
+const templateId = Number(req.query.templateId);
+ 
+if (!templateId) {
+  return res.status(400).json({ message: "templateId is required." });
+}
 
-  } catch (error) {
-    console.error("Error creating AdminTemplate:", error);
-    res.status(500).json({ message: "Internal server error", error });
+const template = await prisma.adminTemplate.findFirst({
+  where: { 
+    id: templateId,
+    OR: [
+      { createdById: userId }, // if the user is the creator
+      { enabledUsers: { some: { id: userId } } } // or user is enabled
+    ]
+  },
+  include: {
+    steps: true,
+    enabledUsers: true
   }
+});
+
+if (!template) {
+  return res.status(404).json({ message: "Template not found or access denied." });
+}
+
+res.status(200).json({ message: "Fetched your single template", template });
+ 
+
+} catch (error) {
+console.error("Error fetching single template:", error);
+res.status(500).json({ message: "Internal server error", error });
+}
 };
+
 export const fetchAllTemplates = async (req: Request, res: Response) => {
   try {  
     const templates = await prisma.adminTemplate.findMany({include:{steps:true ,enabledUsers:true }});

@@ -2,8 +2,7 @@ import { Request, Response, NextFunction } from "express";
 // import {JwtPayload} from "jsonwebtoken"; 
 import jwt, { JwtPayload } from 'jsonwebtoken'
 // import config from "../config";
-import prisma from "../db/db"; 
-import { decode } from "punycode";
+import prisma from "../db/db";  
 const jwtConfig = {
   sign(payload: object): string {
     console.log("payload",payload) 
@@ -13,7 +12,7 @@ const jwtConfig = {
   },
   verifyUser(req: Request, res: Response, next: NextFunction) {
     const authHeader = req?.headers?.authorization;
-
+ console.log('authHeader', req?.headers?.authorization )
     try {
       if (authHeader) {
         const [bearer, token] = authHeader.split(" ");
@@ -21,9 +20,9 @@ const jwtConfig = {
           if (err) {
             res.status(401).json({ message: "You need to login first" });
           } else {
-            const user = await prisma.user.findFirst({
+            const user = await prisma.user.findUnique({
               where: {
-                token
+                id:decoded.id
               }
             })
             if (user) {
@@ -125,7 +124,9 @@ const jwtConfig = {
   },
   authGuard(req: Request, res: Response) {
     const authHeader = req?.headers?.authorization;
-
+    console.log("req?.headers")
+    console.log(req?.headers)
+    console.log("req?.headers")
     try {
       if (authHeader) {
         console.log(res.locals.user)
@@ -141,7 +142,7 @@ const jwtConfig = {
               }
             })
             if (user) {
-              return res.status(200).json({ message: "User Authorized" })
+              return res.status(200).json({ message: "User Authorized",isAdmin:user.isAdmin })
 
             }
             return res.status(200).json({ message: "You are not authorized" })
