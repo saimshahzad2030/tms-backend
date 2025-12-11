@@ -32,11 +32,9 @@ const port = process.env.PORT || 3000;
 
 app.get('/', async (req: Request, res: Response) => {
   try {
-      await prisma.user.findMany({ take: 10 }).then(() => {
-           res.status(200).json({ message: 'Backend Working Fine' })
+       await prisma.adminTemplate.findMany({ take: 10 });
 
-      })
-
+    res.status(200).json({ message: 'Backend Working Fine' });
   } catch (error) {
     res.status(500).json({ error: error });
   }
