@@ -36,7 +36,7 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
             type: step.type,
             linkedStepId: step.linkedStepId,
             trigger: step.trigger,
-            popupDescription: step?.popup?.description,
+            popupDescription: step?.popupDescription,
            completed: step.completed === "true" || step.completed === true, // <- force boolean
         unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
         columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
@@ -144,7 +144,7 @@ const updatedTemplate = await prisma.adminTemplate.update({
       
       linkedStepId: step.linkedStepId,
       trigger: step.trigger,
-      popupDescription: step?.popup?.description,
+      popupDescription: step?.popupDescription,
         completed: step.completed === "true" || step.completed === true, // <- force boolean
         unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
         columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,

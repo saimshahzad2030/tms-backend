@@ -47,33 +47,30 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                 createdBy: { connect: { id: adminId } },
                 categories: categories,
                 steps: {
-                    create: steps.map((step, index) => {
-                        var _a;
-                        return ({
-                            name: step.name,
-                            columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
-                            description: step.description,
-                            type: step.type,
-                            linkedStepId: step.linkedStepId,
-                            trigger: step.trigger,
-                            popupDescription: (_a = step === null || step === void 0 ? void 0 : step.popup) === null || _a === void 0 ? void 0 : _a.description,
-                            completed: step.completed === "true" || step.completed === true, // <- force boolean
-                            unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
-                            columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
-                            unCheckOption: step.unCheckOption,
-                            timeSensitiveColors: step.timeSensitiveColors,
-                            isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
-                            futureColumnThings: step.futureColumnThings,
-                            columnDetails: step.columnDetails,
-                            linkedStep: step.linkedStep
-                            // futureColumnThings: step.futureColumnThings
-                            //   ? { create: step.futureColumnThings }
-                            //   : undefined,
-                            // columnDetails: step.columnDetails
-                            //   ? { create: step.columnDetails }
-                            //   : undefined
-                        });
-                    })
+                    create: steps.map((step, index) => ({
+                        name: step.name,
+                        columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
+                        description: step.description,
+                        type: step.type,
+                        linkedStepId: step.linkedStepId,
+                        trigger: step.trigger,
+                        popupDescription: step === null || step === void 0 ? void 0 : step.popupDescription,
+                        completed: step.completed === "true" || step.completed === true, // <- force boolean
+                        unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
+                        columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
+                        unCheckOption: step.unCheckOption,
+                        timeSensitiveColors: step.timeSensitiveColors,
+                        isTimeSensitive: step.isTimeSensitive === "true" || step.isTimeSensitive === true,
+                        futureColumnThings: step.futureColumnThings,
+                        columnDetails: step.columnDetails,
+                        linkedStep: step.linkedStep
+                        // futureColumnThings: step.futureColumnThings
+                        //   ? { create: step.futureColumnThings }
+                        //   : undefined,
+                        // columnDetails: step.columnDetails
+                        //   ? { create: step.columnDetails }
+                        //   : undefined
+                    }))
                 }
             },
             include: { steps: true }
@@ -140,10 +137,9 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                 createdBy: { connect: { id: adminId } },
                 steps: {
                     create: steps.map((step) => {
-                        var _a;
                         let linkedStepWithoutIndex = undefined;
                         if (step.linkedStep) {
-                            const _b = step.linkedStep, { index } = _b, rest = __rest(_b, ["index"]);
+                            const _a = step.linkedStep, { index } = _a, rest = __rest(_a, ["index"]);
                             linkedStepWithoutIndex = rest;
                         }
                         return {
@@ -153,7 +149,7 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                             columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
                             linkedStepId: step.linkedStepId,
                             trigger: step.trigger,
-                            popupDescription: (_a = step === null || step === void 0 ? void 0 : step.popup) === null || _a === void 0 ? void 0 : _a.description,
+                            popupDescription: step === null || step === void 0 ? void 0 : step.popupDescription,
                             completed: step.completed === "true" || step.completed === true, // <- force boolean
                             unCheckEnabled: step.unCheckEnabled === "true" || step.unCheckEnabled === true,
                             columnDetailsChecked: step.columnDetailsChecked === "true" || step.columnDetailsChecked === true,
