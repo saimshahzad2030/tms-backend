@@ -52,6 +52,7 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                         columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
                         description: step.description,
                         type: step.type,
+                        order: index,
                         linkedStepId: step.linkedStepId,
                         trigger: step.trigger,
                         popupDescription: step === null || step === void 0 ? void 0 : step.popupDescription,
@@ -73,7 +74,11 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                     }))
                 }
             },
-            include: { steps: true }
+            include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                }
+            }
         });
         const indexToIdMap = newTemplate.steps.reduce((acc, step, i) => {
             acc[i] = step.id; // maps index in original array to created step id
@@ -95,7 +100,12 @@ const createAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
         }));
         const template = yield db_1.default.adminTemplate.findMany({
             where: { id: newTemplate.id },
-            include: { steps: true, enabledUsers: true },
+            include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                },
+                enabledUsers: true
+            },
         });
         res.status(201).json({ message: "AdminTemplate created successfully", template });
     }
@@ -136,7 +146,7 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                 categories: categories,
                 createdBy: { connect: { id: adminId } },
                 steps: {
-                    create: steps.map((step) => {
+                    create: steps.map((step, index) => {
                         let linkedStepWithoutIndex = undefined;
                         if (step.linkedStep) {
                             const _a = step.linkedStep, { index } = _a, rest = __rest(_a, ["index"]);
@@ -145,6 +155,7 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                         return {
                             name: step.name,
                             description: step.description,
+                            order: index,
                             type: step.type,
                             columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
                             linkedStepId: step.linkedStepId,
@@ -163,7 +174,11 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
                     }),
                 },
             },
-            include: { steps: true },
+            include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                }
+            }
         });
         // Map step indices to newly created step IDs
         const indexToIdMap = updatedTemplate.steps.reduce((acc, step, i) => {
@@ -186,7 +201,12 @@ const updateAdminTemplate = (req, res) => __awaiter(void 0, void 0, void 0, func
         }));
         const template = yield db_1.default.adminTemplate.findUnique({
             where: { id },
-            include: { steps: true, enabledUsers: true },
+            include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                },
+                enabledUsers: true
+            },
         });
         res.status(200).json({ message: "AdminTemplate updated successfully", template });
     }
@@ -202,7 +222,12 @@ const fetchAdminTemplates = (req, res) => __awaiter(void 0, void 0, void 0, func
         const adminId = (_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.id;
         const templates = yield db_1.default.adminTemplate.findMany({
             where: { createdById: adminId },
-            include: { steps: true, enabledUsers: true }
+            include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                },
+                enabledUsers: true
+            },
         });
         res.status(201).json({ message: "Fetched Admin Templates", templates });
     }
@@ -245,7 +270,9 @@ const fetchUserAllowedSingleTemplate = (req, res) => __awaiter(void 0, void 0, v
                 ]
             },
             include: {
-                steps: true,
+                steps: {
+                    orderBy: { order: "asc" }
+                },
                 enabledUsers: true
             }
         });
@@ -262,7 +289,12 @@ const fetchUserAllowedSingleTemplate = (req, res) => __awaiter(void 0, void 0, v
 exports.fetchUserAllowedSingleTemplate = fetchUserAllowedSingleTemplate;
 const fetchAllTemplates = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const templates = yield db_1.default.adminTemplate.findMany({ include: { steps: true, enabledUsers: true } });
+        const templates = yield db_1.default.adminTemplate.findMany({ include: {
+                steps: {
+                    orderBy: { order: "asc" }
+                },
+                enabledUsers: true
+            } });
         res.status(201).json({ message: "Fetched All Templates", templates });
     }
     catch (error) {

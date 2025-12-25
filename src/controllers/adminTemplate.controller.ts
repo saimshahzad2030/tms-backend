@@ -34,6 +34,7 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
             columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
             description: step.description,
             type: step.type,
+            order:index,
             linkedStepId: step.linkedStepId,
             trigger: step.trigger,
             popupDescription: step?.popupDescription,
@@ -55,7 +56,11 @@ export const createAdminTemplate = async (req: Request, res: Response) => {
           }))
         }
       }
-      , include: { steps: true }
+      ,include: {
+  steps: {
+    orderBy: { order: "asc" }
+  }
+}
     });
 
      
@@ -83,8 +88,12 @@ await Promise.all(
 );
 
     const template = await prisma.adminTemplate.findMany({
-      where: { id: newTemplate.id },
-      include: { steps: true,enabledUsers:true  },
+      where: { id: newTemplate.id }, 
+       include: { 
+           steps: {
+    orderBy: { order: "asc" }
+  } 
+          ,enabledUsers:true  },
     });
     res.status(201).json({ message: "AdminTemplate created successfully",template });
 
@@ -130,7 +139,7 @@ const updatedTemplate = await prisma.adminTemplate.update({
     categories: categories,
     createdBy: { connect: { id: adminId } },
     steps: {
-  create: steps.map((step) => {
+  create: steps.map((step,index) => {
     let linkedStepWithoutIndex = undefined;
     if (step.linkedStep) {
       const { index, ...rest } = step.linkedStep;
@@ -139,6 +148,7 @@ const updatedTemplate = await prisma.adminTemplate.update({
     return {
       name: step.name,
       description: step.description,
+      order: index,
       type: step.type,
             columnByCategoriesEnabled: step.columnByCategoriesEnabled === "true" || step.columnByCategoriesEnabled === true,
       
@@ -159,7 +169,11 @@ const updatedTemplate = await prisma.adminTemplate.update({
 },
 
   },
-  include: { steps: true },
+  include: {
+  steps: {
+    orderBy: { order: "asc" }
+  }
+}
 });
 
 // Map step indices to newly created step IDs
@@ -189,7 +203,11 @@ await Promise.all(
 
 const template = await prisma.adminTemplate.findUnique({
   where: { id },
-        include: { steps: true,enabledUsers:true  },
+        include: { 
+           steps: {
+    orderBy: { order: "asc" }
+  } 
+          ,enabledUsers:true  },
 
 });
 
@@ -208,7 +226,11 @@ export const fetchAdminTemplates = async (req: Request, res: Response) => {
  
     const templates = await prisma.adminTemplate.findMany({
       where: { createdById: adminId},
-       include:{steps:true ,enabledUsers:true  } 
+       include: { 
+           steps: {
+    orderBy: { order: "asc" }
+  } 
+          ,enabledUsers:true  },
     });
     res.status(201).json({ message: "Fetched Admin Templates",templates });
 
@@ -250,7 +272,9 @@ const template = await prisma.adminTemplate.findFirst({
     ]
   },
   include: {
-    steps: true,
+    steps: {
+    orderBy: { order: "asc" }
+  } ,
     enabledUsers: true
   }
 });
@@ -270,7 +294,11 @@ res.status(500).json({ message: "Internal server error", error });
 
 export const fetchAllTemplates = async (req: Request, res: Response) => {
   try {  
-    const templates = await prisma.adminTemplate.findMany({include:{steps:true ,enabledUsers:true }});
+    const templates = await prisma.adminTemplate.findMany({include:{
+       steps: {
+    orderBy: { order: "asc" }
+  }
+      ,enabledUsers:true }});
     res.status(201).json({ message: "Fetched All Templates",templates });
 
   } catch (error) {

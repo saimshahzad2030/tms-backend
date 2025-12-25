@@ -55,7 +55,7 @@ model Step {
   popupDescription     String?
   completed            Boolean?             @default(false)
   columnByCategoriesEnabled Boolean?      @default(false)
- 
+ order                  Int?
     unCheckEnabled       Boolean? 
   templateId           Int
   template             AdminTemplate        @relation("TemplateSteps", fields: [templateId], references: [id])
